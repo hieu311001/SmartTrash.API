@@ -3,12 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartTrash.API.Entity
 {
-    [Table("location")]
-    public class Location
+    [Table("garage")]
+    public class Garage
     {
         [Key]
-        public Guid LocationID { get; set; }
+        public Guid GarageID { get; set; }
+
         [Required]
-        public string LocationName { get; set; }
+        public string? Location { get; set; }
+
     }
 }

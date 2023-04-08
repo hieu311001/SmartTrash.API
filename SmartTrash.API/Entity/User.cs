@@ -11,11 +11,6 @@ namespace SmartTrash.API.Entity
         public Guid UserID { get; set; }
 
         [Required]
-        public Guid LocationID { get; set; }
-
-        public string? LocationName { get; set; }
-
-        [Required]
         public string UserName { get; set; }
 
         [Required]
