@@ -13,11 +13,10 @@ namespace SmartTrash.API.Entity
         [Required]
         public Guid RecycleBinID { get; set; }
 
-        public string? RecycleBinName { get; set; }
         [Required]
         public NotificationType NotificationType { get; set; }
         [Required]
-        public string NotificationName { get; set; }    
+        public string? NotificationName { get; set; }    
 
     }
 }
