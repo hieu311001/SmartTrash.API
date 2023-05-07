@@ -12,11 +12,14 @@ namespace SmartTrash.API.Controller
         protected string connectionString;
         protected MySqlConnection mySqlConnection;
         protected string className;
+        protected string apiKey;
 
         public BaseController(IConfiguration configuration)
         {
             // Khai báo thông tin kết nối
             connectionString = configuration.GetConnectionString("dataBase");
+
+            apiKey = configuration.GetConnectionString("apiKey");
             // Khai báo tên bảng
             className = typeof(T).Name;
             mySqlConnection = new MySqlConnection(connectionString);
