@@ -1,6 +1,6 @@
 # SmartTrash.API
 
-Sử dụng Visual Studio để mở project
+Sử dụng Visual Studio để mở project: File SmartTrash.API.sln
 
 Trước khi chạy BE, mọi người mở file appsettings.json và sửa lại phần ConnectionString.database như sau:
 - "Server=localhost;Port={port};Database={tên db};Uid=root;Pwd={mật khẩu}".
