@@ -2,8 +2,9 @@
 
 Sử dụng Visual Studio để mở project
 
-Trước khi chạy BE, mọi người mở file appsettings.json và sửa lại phần ConnectionString.database như sau
-"Server=localhost;Port={port};Database={tên db};Uid=root;Pwd={mật khẩu}"
+Trước khi chạy BE, mọi người mở file appsettings.json và sửa lại phần ConnectionString.database như sau:
+- "Server=localhost;Port={port};Database={tên db};Uid=root;Pwd={mật khẩu}".
+
 Hiện tên Database đang để mặc định là smart_trash, cần tạo sẵn một database smart_trash trước khi chạy file sql.
 
 Các api cần chú thích:
