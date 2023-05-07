@@ -1,5 +1,11 @@
 # SmartTrash.API
 
+Sử dụng Visual Studio để mở file
+
+Trước khi chạy BE, mọi người mở file appsettings.json và sửa lại phần ConnectionString.database như sau
+"Server=localhost;Port={port};Database={tên db};Uid=root;Pwd={mật khẩu}"
+Hiện tên Database đang để mặc định là smart_trash, cần tạo sẵn một database smart_trash trước khi chạy file sql.
+
 Các api cần chú thích:
 
 Các api chung: 
@@ -26,4 +32,3 @@ Garbagetruck:
 
 RecycleBin: 
 - POST/api/v1/RecycleBin/clearTrash: api thực hiện cập nhật toàn bộ độ đầy các thùng rác đầu vào về 0 (thu gom xong). Đầu vào là một chuỗi các id thùng rác ngăn cách nhau bởi dấu ";". Bên FE sau khi demo đường đi của xe có thể gọi api này để cập nhật các thùng rác mà xe đã đi qua.
-
