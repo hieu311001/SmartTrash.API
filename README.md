@@ -37,6 +37,6 @@ RecycleBin:
 
 UPDATE API TÌM ĐƯỜNG:
 - Proc_GarbageTruck_NextWay: Store database cập nhật vị trí hiện tại của xe theo thùng rác tiếp theo, xóa thùng rác đó khỏi id list, trả về danh sách xe thu gom.
-- Proc_RecycleBin_GetFull: Store database lấy những thùng rác không bị hỏng, không đang đổ, sức chứa > 80%.
+- Proc_RecycleBin_GetFull: Store database lấy những thùng rác không bị hỏng, không đang đổ, đang chứa > 80%.
 - Lấy kho gần nhất với xe tại vị trí hiện tại, nếu là kho ban đầu thì không thêm, nếu khác thì cập nhật thêm id kho phụ.
 - Cập nhật lại api key để dùng api tìm đường.
