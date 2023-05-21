@@ -1,10 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿
 using SmartTrash.API.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace SmartTrash.API.Entity
 {

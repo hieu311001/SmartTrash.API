@@ -18,8 +18,6 @@ namespace SmartTrash.API.Controller
         {
             // Khai báo thông tin kết nối
             connectionString = configuration.GetConnectionString("dataBase");
-
-            apiKey = configuration.GetConnectionString("apiKey");
             // Khai báo tên bảng
             className = typeof(T).Name;
             mySqlConnection = new MySqlConnection(connectionString);
