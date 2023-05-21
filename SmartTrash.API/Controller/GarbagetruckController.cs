@@ -20,18 +20,23 @@ namespace SmartTrash.API.Controller
         public IActionResult FindWay()
         {
             // Chuẩn bị câu lệnh 
-            var garbageTruckCommand = $"Proc_GarbageTruck_GetAll";
-            var recycleBinCommand = $"Proc_RecycleBin_GetAll";
+            var garbageTruckCommand = $"Proc_GarbageTruck_NextWay";
+            var recycleBinCommand = $"Proc_RecycleBin_GetFull";
+            var garageCommand = $"Proc_Garage_GetAll";
 
             // Thực hiện gọi vào db để chạy câu lệnh 
             var garbageTruckResult = mySqlConnection.Query<GarbageTruck>(garbageTruckCommand, commandType: System.Data.CommandType.StoredProcedure).ToList();
             var recycleBinResult = mySqlConnection.Query<RecycleBin>(recycleBinCommand, commandType: System.Data.CommandType.StoredProcedure).ToList();
+            var garageResult = mySqlConnection.Query<Garage>(garageCommand, commandType: System.Data.CommandType.StoredProcedure).ToList();
 
             // Lấy dữ liệu khoảng cách
             List<RouteNode> routeResult = new List<RouteNode>();
 
+            // Lấy dữ liệu khoảng cách xe với kho
+            List<RouteNode> routeToGarage = new List<RouteNode>();
+
             // 1. Lấy dữ liệu khoảng cách giữa xe thu gom với các thùng rác
-            foreach(var truckItem in garbageTruckResult)
+            foreach (var truckItem in garbageTruckResult)
             {
                 foreach(var binItem in recycleBinResult)
                 {
@@ -54,6 +59,32 @@ namespace SmartTrash.API.Controller
                         node.Prioritize = node.Distance * binItem.DaySinceLastCollection * binItem.Usages / 100;
                         node.RouteNodeType = Enum.RouteNodeType.GarbageTruck;
                         routeResult.Add(node);
+                    }
+                    catch
+                    {
+                    }
+                }
+                // Lấy dữ liệu khoảng cách xe với kho
+                foreach(var garageItem in garageResult)
+                {
+                    string url = $"https://maps.googleapis.com/maps/api/directions/json?key={apiKey}&origin={truckItem.Location.Replace(" ", "")}&destination={garageItem.Location.Replace(" ", "")}";
+                    string requesturl = url;
+
+                    System.Net.WebClient wc = new System.Net.WebClient();
+                    byte[] response = wc.DownloadData(requesturl);
+
+                    string sContents = string.Empty;
+                    sContents = System.Text.Encoding.ASCII.GetString(response);
+                    JObject o = JObject.Parse(sContents);
+                    try
+                    {
+
+                        RouteNode node = new RouteNode();
+                        node.OriginID = truckItem.GarbageTruckID;
+                        node.DestinationID = garageItem.GarageID;
+                        node.Distance = (double)o.SelectToken("routes[0].legs[0].distance.value");
+                        node.Prioritize = node.Distance;
+                        routeToGarage.Add(node);
                     }
                     catch
                     {
@@ -131,6 +162,7 @@ namespace SmartTrash.API.Controller
                 }
             }
 
+
             // 4. Gán lại kết quả tìm đường vào db
             var resetRouteCommand = $"Proc_GarbageTruck_ResetRoute";
 
@@ -144,7 +176,16 @@ namespace SmartTrash.API.Controller
                 {
                     Guid garbageTruckID = tempNodes.First().OriginID;
                     string recycleBinIDs = tempNodes.First().DestinationID + ";";
-                    foreach(var node in tempNodes.Where(item => item.RouteNodeType == Enum.RouteNodeType.RecycleBin))
+                    Guid tempGarageID = Guid.Empty;
+
+                    // Tính kho gần nhất với mỗi xe
+                    var closestGarage = routeToGarage.Where(item => item.OriginID == garbageTruckResult[i].GarbageTruckID).OrderBy(item => item.Distance).First();
+                    if (closestGarage.DestinationID != garbageTruckResult[i].GarageID)
+                    {
+                        tempGarageID = closestGarage.DestinationID;
+                    }
+
+                    foreach (var node in tempNodes.Where(item => item.RouteNodeType == Enum.RouteNodeType.RecycleBin))
                     {
                         recycleBinIDs += node.DestinationID + ";";
                     }
@@ -152,6 +193,7 @@ namespace SmartTrash.API.Controller
                     var parameters = new DynamicParameters();
                     parameters.Add($"garbageTruckID", garbageTruckID);
                     parameters.Add($"recycleBinIDs", recycleBinIDs);
+                    parameters.Add($"tempGarageID", tempGarageID);
 
                     // Thực hiện gọi vào db để chạy câu lệnh 
                     result = mySqlConnection.Execute(resetRouteCommand, param: parameters, commandType: System.Data.CommandType.StoredProcedure);
@@ -159,14 +201,7 @@ namespace SmartTrash.API.Controller
             }
             // Xử lý kết quả trả về ở db
 
-            if (result != 0)
-            {
-                return StatusCode(StatusCodes.Status200OK, result);
-            }
-            else
-            {
-                return StatusCode(StatusCodes.Status400BadRequest);
-            }
+            return StatusCode(StatusCodes.Status200OK, result);
         }
     }
 }
