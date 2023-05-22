@@ -40,3 +40,7 @@ UPDATE API TÌM ĐƯỜNG:
 - Proc_RecycleBin_GetFull: Store database lấy những thùng rác không bị hỏng, không đang đổ, đang chứa > 80%.
 - Lấy kho gần nhất với xe tại vị trí hiện tại, nếu là kho ban đầu thì không thêm, nếu khác thì cập nhật thêm id kho phụ.
 - Cập nhật lại api key để dùng api tìm đường.
+
+Notification: 
+- GET/api/v1/Notification/notifyTruck: api thực hiện quét các thùng rác, tự động tạo thông báo nếu thùng đầy hoặc thùng hỏng. Gợi ý: chạy api mỗi khi chuyển sang tab thông báo, sau đó hiển thị danh sách thông báo
+- DELETE/api/v1/Notification/notify: api xóa nhiều thông báo, đầu vào là 1 mảng ID các thông báo, ngăn cách nhau bởi dấu ";"
