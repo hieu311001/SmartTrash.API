@@ -24,6 +24,7 @@ namespace SmartTrash.API.Controller
             List<RecycleBin> recycleBins = (List<RecycleBin>)resultFull;
             List<Notification> notifys = (List<Notification>)resultNotify;
             List<Notification> notifications = new List<Notification>();
+            List<Notification> notNotify = new List<Notification>();
 
             foreach (RecycleBin recycleBin in recycleBins)
             {
@@ -48,16 +49,37 @@ namespace SmartTrash.API.Controller
                         RecycleBinID = recycleBin.RecycleBinID
                     };
                     notifications.Add(notification);
+                } else
+                {
+                    var notification = new Notification()
+                    {
+                        NotificationID = new Guid(),
+                        NotificationType = Enum.NotificationType.RecycleBinFull,
+                        NotificationName = "Thùng rác ngon",
+                        RecycleBinID = recycleBin.RecycleBinID
+                    };
+                    notNotify.Add(notification);
                 }
             }
 
             List<Notification> notificationClone = notifications;
-
+            // Xóa bản ghi đã tồn tại trong danh sách
             for (var i = 0; i < notifications.Count; i++)
             {
                 for (var j = 0; j < notifys.Count; j++)
                 {
                     if (notifys[j].RecycleBinID == notifications[i].RecycleBinID)
+                    {
+                        notificationClone.RemoveAt(i);
+                    }
+                }
+            }
+            // Xóa bản ghi mà thùng đã được sửa or thu rác
+            for (var i = 0; i < notifications.Count; i++)
+            {
+                for (var j = 0; j < notNotify.Count; j++)
+                {
+                    if (notNotify[j].RecycleBinID == notifications[i].RecycleBinID)
                     {
                         notificationClone.RemoveAt(i);
                     }
