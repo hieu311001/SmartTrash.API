@@ -43,7 +43,7 @@ namespace SmartTrash.API.Controller
             parameters.Add("ids", whereClause);
 
             // Thực hiện gọi vào db để chạy câu lệnh 
-            var result = mySqlConnection.Execute(getCommand, commandType: System.Data.CommandType.StoredProcedure);
+            var result = mySqlConnection.Execute(getCommand, parameters, commandType: System.Data.CommandType.StoredProcedure);
             // Xử lý kết quả trả về ở db
             if (result != null)
             {
