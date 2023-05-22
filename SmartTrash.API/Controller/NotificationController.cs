@@ -9,23 +9,22 @@ namespace SmartTrash.API.Controller
         public NotificationController(IConfiguration configuration) : base(configuration)
         {
         }
-
+        /// <summary>
+        /// API tìm kiếm thùng đầy hoặc hỏng để hiển thị thông báo
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("notifyTruck")]
         public IActionResult CreateNotification()
         {
             // Chuẩn bị câu lệnh 
             var notify = $"Proc_Recyclebin_GetAll";
-            var allNotify = $"Proc_Notification_GetAll";
 
             // Thực hiện gọi vào db để chạy câu lệnh 
             var resultFull = mySqlConnection.Query<RecycleBin>(notify, commandType: System.Data.CommandType.StoredProcedure);
-            var resultNotify = mySqlConnection.Query<Notification>(allNotify, commandType: System.Data.CommandType.StoredProcedure);
 
             List<RecycleBin> recycleBins = (List<RecycleBin>)resultFull;
-            List<Notification> notifys = (List<Notification>)resultNotify;
             List<Notification> notifications = new List<Notification>();
-            List<Notification> notNotify = new List<Notification>();
-
+            // Thực hiện quét để tìm kiếm các thùng đầy hoặc hỏng
             foreach (RecycleBin recycleBin in recycleBins)
             {
                 if (recycleBin.RecyclebinStatus == Enum.RecycleBinStatus.Broken)
@@ -49,81 +48,45 @@ namespace SmartTrash.API.Controller
                         RecycleBinID = recycleBin.RecycleBinID
                     };
                     notifications.Add(notification);
-                } else
-                {
-                    var notification = new Notification()
-                    {
-                        NotificationID = new Guid(),
-                        NotificationType = Enum.NotificationType.RecycleBinFull,
-                        NotificationName = "Thùng rác ngon",
-                        RecycleBinID = recycleBin.RecycleBinID
-                    };
-                    notNotify.Add(notification);
-                }
+                } 
             }
 
-            List<Notification> notificationClone = notifications;
-            // Xóa bản ghi đã tồn tại trong danh sách
-            for (var i = 0; i < notifications.Count; i++)
-            {
-                for (var j = 0; j < notifys.Count; j++)
-                {
-                    if (notifys[j].RecycleBinID == notifications[i].RecycleBinID)
-                    {
-                        notificationClone.RemoveAt(i);
-                    }
-                }
-            }
-            // Xóa bản ghi mà thùng đã được sửa or thu rác
-            for (var i = 0; i < notifications.Count; i++)
-            {
-                for (var j = 0; j < notNotify.Count; j++)
-                {
-                    if (notNotify[j].RecycleBinID == notifications[i].RecycleBinID)
-                    {
-                        notificationClone.RemoveAt(i);
-                    }
-                }
-            }
-
-            notifications = notificationClone;
-
-            var insertedRow = 0;
-            using (var transaction = mySqlConnection.BeginTransaction())
-            {
-                try
-                {
-                    var sqlCommand = $"Proc_Notification_Insert";
-                    foreach (var notification in notifications)
-                    {
-                        insertedRow += mySqlConnection.Execute(sqlCommand, param: notification, transaction: transaction, commandType: System.Data.CommandType.StoredProcedure);
-                    }
-                    if (insertedRow == notifications.Count)
-                    {
-                        transaction.Commit();
-                    }
-                    else
-                    {
-                        transaction.Rollback();
-                    }
-                }
-                catch (Exception e)
-                {
-                    transaction.Rollback();
-                }
-                finally
-                {
-                    if (mySqlConnection != null && mySqlConnection.State != System.Data.ConnectionState.Closed)
-                    {
-                        mySqlConnection.Close();
-                    }
-                }
-            }
+            //var insertedRow = 0;
+            //using (var transaction = mySqlConnection.BeginTransaction())
+            //{
+            //    try
+            //    {
+            //        var sqlCommand = $"Proc_Notification_Insert";
+            //        foreach (var notification in notifications)
+            //        {
+            //            insertedRow += mySqlConnection.Execute(sqlCommand, param: notification, transaction: transaction, commandType: System.Data.CommandType.StoredProcedure);
+            //        }
+            //        if (insertedRow == notifications.Count)
+            //        {
+            //            transaction.Commit();
+            //        }
+            //        else
+            //        {
+            //            transaction.Rollback();
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        transaction.Rollback();
+            //    }
+            //    finally
+            //    {
+            //        if (mySqlConnection != null && mySqlConnection.State != System.Data.ConnectionState.Closed)
+            //        {
+            //            mySqlConnection.Close();
+            //        }
+            //    }
+            //}
 
             // Xử lý kết quả trả về ở db
-            if (insertedRow != null)
+            if (notifications != null)
             {
-                return StatusCode(StatusCodes.Status200OK, insertedRow);
+                return StatusCode(StatusCodes.Status200OK, notifications);
             }
             else
             {
