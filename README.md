@@ -42,5 +42,5 @@ UPDATE API TÌM ĐƯỜNG:
 - Cập nhật lại api key để dùng api tìm đường.
 
 Notification: 
-- GET/api/v1/Notification/notifyTruck: api thực hiện quét các thùng rác, tự động tạo thông báo nếu thùng đầy hoặc thùng hỏng. Gợi ý: chạy api mỗi khi chuyển sang tab thông báo, sau đó hiển thị danh sách thông báo
+- GET/api/v1/Notification/notifyTruck: api thực hiện quét các thùng rác, tự động tạo thông báo nếu thùng đầy hoặc thùng hỏng.Trả về 1 list các thông báo thùng rác . Gợi ý: chạy api mỗi khi chuyển sang tab thông báo, lấy kết quả trả về sau đó hiển thị danh sách thông báo
 - DELETE/api/v1/Notification/notify: api xóa nhiều thông báo, đầu vào là 1 mảng ID các thông báo, ngăn cách nhau bởi dấu ";"
