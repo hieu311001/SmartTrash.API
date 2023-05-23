@@ -34,6 +34,7 @@ Garbagetruck:
 
 RecycleBin: 
 - POST/api/v1/RecycleBin/clearTrash: api thực hiện cập nhật toàn bộ độ đầy các thùng rác đầu vào về 0 (thu gom xong). Đầu vào là một chuỗi các id thùng rác ngăn cách nhau bởi dấu ";". Bên FE sau khi demo đường đi của xe có thể gọi api này để cập nhật các thùng rác mà xe đã đi qua.
+- GET/api/v1/RecycleBin/autoIncrease: api tự động tăng random độ đầy của 1 số thùng rác. Chỉ cần gọi đến là được. Kết quả trả về là số thùng rác được tăng độ đầy.
 
 UPDATE API TÌM ĐƯỜNG:
 - Proc_GarbageTruck_NextWay: Store database cập nhật vị trí hiện tại của xe theo thùng rác tiếp theo, xóa thùng rác đó khỏi id list, trả về danh sách xe thu gom.
