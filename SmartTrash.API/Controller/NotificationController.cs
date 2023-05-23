@@ -17,12 +17,14 @@ namespace SmartTrash.API.Controller
         public IActionResult CreateNotification()
         {
             // Chuẩn bị câu lệnh 
-            var notify = $"Proc_Recyclebin_GetAll";
+            var recyclebin = $"Proc_Recyclebin_GetAll";
+            string resetNotify = "DELETE FROM notification";
 
             // Thực hiện gọi vào db để chạy câu lệnh 
-            var resultFull = mySqlConnection.Query<RecycleBin>(notify, commandType: System.Data.CommandType.StoredProcedure);
+            var recycles = mySqlConnection.Query<RecycleBin>(recyclebin, commandType: System.Data.CommandType.StoredProcedure);
+            var numberDelete = mySqlConnection.Execute(resetNotify);
 
-            List<RecycleBin> recycleBins = (List<RecycleBin>)resultFull;
+            List<RecycleBin> recycleBins = (List<RecycleBin>)recycles;
             List<Notification> notifications = new List<Notification>();
             // Thực hiện quét để tìm kiếm các thùng đầy hoặc hỏng
             foreach (RecycleBin recycleBin in recycleBins)
@@ -34,7 +36,8 @@ namespace SmartTrash.API.Controller
                         NotificationID = new Guid(),
                         NotificationType = Enum.NotificationType.RecycleBinBroken,
                         NotificationName = "Thùng rác hỏng",
-                        RecycleBinID = recycleBin.RecycleBinID
+                        RecycleBinID = recycleBin.RecycleBinID,
+                        RecycleBinName = recycleBin.RecycleBinName
                     };
                     notifications.Add(notification);
                 }
@@ -45,43 +48,44 @@ namespace SmartTrash.API.Controller
                         NotificationID = new Guid(),
                         NotificationType = Enum.NotificationType.RecycleBinFull,
                         NotificationName = "Thùng rác đầy",
-                        RecycleBinID = recycleBin.RecycleBinID
+                        RecycleBinID = recycleBin.RecycleBinID,
+                        RecycleBinName = recycleBin.RecycleBinName
                     };
                     notifications.Add(notification);
                 } 
             }
 
-            //var insertedRow = 0;
-            //using (var transaction = mySqlConnection.BeginTransaction())
-            //{
-            //    try
-            //    {
-            //        var sqlCommand = $"Proc_Notification_Insert";
-            //        foreach (var notification in notifications)
-            //        {
-            //            insertedRow += mySqlConnection.Execute(sqlCommand, param: notification, transaction: transaction, commandType: System.Data.CommandType.StoredProcedure);
-            //        }
-            //        if (insertedRow == notifications.Count)
-            //        {
-            //            transaction.Commit();
-            //        }
-            //        else
-            //        {
-            //            transaction.Rollback();
-            //        }
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        transaction.Rollback();
-            //    }
-            //    finally
-            //    {
-            //        if (mySqlConnection != null && mySqlConnection.State != System.Data.ConnectionState.Closed)
-            //        {
-            //            mySqlConnection.Close();
-            //        }
-            //    }
-            //}
+            var insertedRow = 0;
+            using (var transaction = mySqlConnection.BeginTransaction())
+            {
+                try
+                {
+                    var sqlCommand = $"Proc_Notification_Insert";
+                    foreach (var notification in notifications)
+                    {
+                        insertedRow += mySqlConnection.Execute(sqlCommand, param: notification, transaction: transaction, commandType: System.Data.CommandType.StoredProcedure);
+                    }
+                    if (insertedRow == notifications.Count)
+                    {
+                        transaction.Commit();
+                    }
+                    else
+                    {
+                        transaction.Rollback();
+                    }
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                }
+                finally
+                {
+                    if (mySqlConnection != null && mySqlConnection.State != System.Data.ConnectionState.Closed)
+                    {
+                        mySqlConnection.Close();
+                    }
+                }
+            }
 
             // Xử lý kết quả trả về ở db
             if (notifications != null)

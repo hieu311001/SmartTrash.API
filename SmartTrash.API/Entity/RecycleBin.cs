@@ -7,20 +7,16 @@ namespace SmartTrash.API.Entity
     [Table("recyclebin")]
     public class RecycleBin
     {
-        [Key]
         public Guid RecycleBinID { get; set; }
 
-        [Required]
         public RecycleBinStatus RecyclebinStatus { get; set; }
 
-        [Required]
         public int Usages { get; set; }
 
-        [Required]
         public int DaySinceLastCollection { get; set; }
 
-        [Required]
         public string? Location { get; set; }
 
+        public string RecycleBinName { get; set; }
     }
 }

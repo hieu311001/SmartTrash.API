@@ -6,11 +6,10 @@ namespace SmartTrash.API.Entity
     [Table("garage")]
     public class Garage
     {
-        [Key]
         public Guid GarageID { get; set; }
-
-        [Required]
         public string? Location { get; set; }
+
+        public string GarageName { get; set; }
 
     }
 }
